@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Million ↔ Crore Converter</title>
+<meta name="description" content="Convert between Lakh, Crore, Million, Billion and any world currency. Simple, modern & accurate."/>
+<link rel="icon" href="https://cdn-icons-png.flaticon.com/512/1086/1086741.png" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg1: #0f172a;
+    --bg2: #0ea5e9;
+    --card: rgba(255,255,255,0.97);
+    --accent: #7c3aed;
+    --accent2: #06b6d4;
+    --positive: #16a34a;
+    --muted: #6b7280;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%;margin:0;font-family:Inter,system-ui,Arial;background:linear-gradient(135deg,#0f172a 0%, #0ea5e9 100%);display:flex;align-items:center;justify-content:center;padding:28px}
+  .wrap{width:100%;max-width:920px}
+  .card{
+    background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(255,255,255,0.96));
+    border-radius:16px;padding:28px;box-shadow:0 20px 60px rgba(2,6,23,0.6);backdrop-filter: blur(6px);
+    transition: transform .18s ease;
+  }
+  .card:hover{transform: translateY(-4px)}
+  header{display:flex;align-items:center;gap:14px;margin-bottom:16px}
+  .logo {
+    width:48px;height:48px;border-radius:10px;background:linear-gradient(135deg,var(--accent),var(--accent2));
+    display:flex;align-items:center;justify-content:center;color:#fff;font-weight:700;font-size:18px;box-shadow:0 6px 18px rgba(124,58,237,0.28)
+  }
+  h1{font-size:20px;margin:0;color:#0f172a}
+  .subtitle{color:var(--muted);font-size:13px;margin-top:6px}
+  label{display:block;margin:8px 0 6px;font-weight:600;color:#0b1220}
+  .row{display:flex;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+  input,select{padding:12px;border-radius:10px;border:1px solid #e6eef7;font-size:15px;background:#fff;box-shadow:inset 0 1px 0 rgba(16,24,40,0.02);flex:1}
+  select.small,input.small{flex:0 0 120px}
+  .exchange{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .equal{font-weight:700;color:#0b1220}
+  .hint{font-size:13px;color:var(--muted);margin-bottom:10px}
+  button{width:100%;padding:13px;border-radius:10px;border:0;background:linear-gradient(90deg,var(--accent),var(--accent2));color:#fff;font-weight:700;font-size:15px;cursor:pointer;box-shadow:0 8px 24px rgba(12,74,110,0.12);transition:transform .12s ease}
+  button:active{transform:translateY(1px)}
+  .result{margin-top:18px;padding:14px;border-radius:10px;background:linear-gradient(180deg, rgba(6,182,212,0.06), rgba(124,58,237,0.03));color:#042a2b;font-weight:700;min-height:56px;white-space:pre-line}
+  .note{font-size:13px;color:#6b7280;margin-top:8px;min-height:18px}
+  footer{margin-top:16px;text-align:center;color:rgba(255,255,255,0.9);font-size:14px}
+  @media(max-width:720px){ .row{flex-direction:column} .exchange input,.exchange select{flex:1 1 100%} }
+</style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" role="main" aria-labelledby="title">
+      <header>
+        <div class="logo">MC</div>
+        <div>
+          <h1 id="title">Million ↔ Crore Converter</h1>
+          <div class="subtitle">Convert between any world currency and units like Thousands, Lakh, Crore, Million, Billion</div>
+        </div>
+      </header>
+
+      <!-- FROM -->
+      <label for="amount">From</label>
+      <div class="row">
+        <input id="amount" type="number" placeholder="Amount (e.g. 50)" aria-label="Amount">
+        <select id="inputUnit" aria-label="Input unit">
+          <option value="">No unit</option>
+          <option value="thousand">Thousands</option>
+          <option value="lakh">Lakh</option>
+          <option value="crore">Crore</option>
+          <option value="million">Million</option>
+          <option value="billion">Billion</option>
+        </select>
+        <select id="fromCurrency" aria-label="From currency"></select>
+      </div>
+
+      <!-- TO -->
+      <label for="toCurrency">To</label>
+      <div class="row">
+        <select id="toCurrency" aria-label="To currency"></select>
+        <select id="outputUnit" aria-label="Output unit">
+          <option value="">No unit</option>
+          <option value="thousand">Thousands</option>
+          <option value="lakh">Lakh</option>
+          <option value="crore">Crore</option>
+          <option value="million">Million</option>
+          <option value="billion">Billion</option>
+        </select>
+      </div>
+
+      <!-- Exchange -->
+      <label>Exchange Rate</label>
+      <div class="row exchange" aria-label="Exchange rate">
+        <select id="exFromCurrency" class="small" aria-label="Exchange from currency"></select>
+        <input id="exFromValue" class="small" type="number" value="1" readonly aria-hidden="true">
+        <span class="equal">=</span>
+        <input id="exchangeRate" type="number" step="any" placeholder="Rate (e.g. 84)" aria-label="Exchange rate">
+        <select id="exToCurrency" class="small" aria-label="Exchange to currency"></select>
+      </div>
+
+      <div class="hint">Type the rate you know (for example: 1 USD = 84 INR). The tool will handle direction automatically.</div>
+
+      <button id="convertBtn" aria-label="Convert">Convert</button>
+
+      <div id="result" class="result" aria-live="polite">Result will appear here</div>
+      <div id="note" class="note" aria-live="polite"></div>
+    </div>
+
+    <footer>Made with ❤️ by MG & a little help from <strong>ChatGPT</strong> | 2025</footer>
+  </div>
+
+<script>
+(() => {
+  const $ = id => document.getElementById(id);
+  const amountEl = $('amount');
+  const inputUnitEl = $('inputUnit');
+  const fromCurrencyEl = $('fromCurrency');
+  const toCurrencyEl = $('toCurrency');
+  const outputUnitEl = $('outputUnit');
+  const exFromCurrencyEl = $('exFromCurrency');
+  const exFromValueEl = $('exFromValue');
+  const exchangeRateEl = $('exchangeRate');
+  const exToCurrencyEl = $('exToCurrency');
+  const resultEl = $('result');
+  const noteEl = $('note');
+  const convertBtn = $('convertBtn');
+
+  const units = { thousand:1e3, lakh:1e5, crore:1e7, million:1e6, billion:1e9 };
+  const currencyList = ["USD","EUR","GBP","INR","AUD","CAD","JPY","CNY","CHF","NZD","SGD","HKD","SEK","KRW","NOK","MXN","BRL","ZAR","TRY","RUB","IDR","MYR","THB","PHP","DKK","PLN","HUF","CZK","ILS","SAR","AED","EGP","NGN","PKR","BDT","LKR","KWD","OMR","QAR","BHD","CLP","COP","PEN","ARS","VND","UAH","KZT","ISK","HRK","RON","BGN","MAD","TWD","KES","TZS","UGX","GHS","BWP","ZMW","MUR","SCR","NAD","SLL","DZD","AOA","AMD","AZN","BAM","BYN","BND","BOB","BSD","BTN","BZD","CDF","CRC","CUP","CVE","DJF","DOP","ERN","ETB","FJD","FKP","GEL","GIP","GMD","GNF","GTQ","GYD","HNL","HTG","IQD","IRR","JMD","JOD","KGS","KHR","KMF","KYD","LAK","LBP","LSL","LYD","MDL","MGA","MKD","MMK","MNT","MOP","MRU","MVR","MWK","MZN","NAD","NIO","NPR","PAB","PGK","PYG","RSD","RWF","SBD","SDG","SHP","SLL","SOS","SRD","STN","SZL","TJS","TMT","TOP","TTD","TWD","UYU","UZS","VES","VUV","WST","XAF","XCD","XOF","XPF","YER","ZWL"];
+
+  function populate(selectEl){ selectEl.innerHTML = currencyList.map(c=>`<option value="${c}">${c}</option>`).join(''); }
+  [fromCurrencyEl,toCurrencyEl,exFromCurrencyEl,exToCurrencyEl].forEach(populate);
+
+  fromCurrencyEl.value = 'INR';
+  toCurrencyEl.value = 'USD';
+  exFromCurrencyEl.value = 'USD';
+  exToCurrencyEl.value = 'INR';
+  exchangeRateEl.value = '84';
+
+  fromCurrencyEl.addEventListener('change', ()=> { if (!exFromCurrencyEl._locked) exFromCurrencyEl.value = fromCurrencyEl.value; });
+  toCurrencyEl.addEventListener('change', ()=> { if (!exToCurrencyEl._locked) exToCurrencyEl.value = toCurrencyEl.value; });
+  exFromCurrencyEl.addEventListener('change', ()=> { exFromCurrencyEl._locked = true; });
+  exToCurrencyEl.addEventListener('change', ()=> { exToCurrencyEl._locked = true; });
+
+  function pretty(n){ if (!isFinite(n)) return '—'; if(Math.abs(n)>=1)return Number(n.toFixed(2)).toLocaleString(); return Number(n.toFixed(6)).toLocaleString(); }
+
+  // Convert number to words (English)
+  function numberToWords(num){
+    if(num===0) return 'zero';
+    const a = ['','one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen','sixteen','seventeen','eighteen','nineteen'];
+    const b = ['','', 'twenty','thirty','forty','fifty','sixty','seventy','eighty','ninety'];
+    const g = ['', 'thousand','million','billion','trillion'];
+
+    function chunk(num){
+      let str = '';
+      if(num>=100){ str+=a[Math.floor(num/100)]+' hundred '; num%=100; }
+      if(num>0){ str+= num<20 ? a[num] : b[Math.floor(num/10)] + (num%10>0?'-'+a[num%10]:''); }
+      return str.trim();
+    }
+
+    let words = [];
+    let i=0;
+    while(num>0){
+      let part = num%1000;
+      if(part>0) words.unshift(chunk(part)+' '+g[i]);
+      num = Math.floor(num/1000);
+      i++;
+    }
+    return words.join(' ').replace(/\s+/g,' ').trim();
+  }
+
+  function convert(){
+    noteEl.textContent = '';
+    const amount = parseFloat(amountEl.value);
+    if(!(amount===0) && !amount){ resultEl.textContent = '⚠️ Enter a valid amount'; return; }
+    const rawRate = parseFloat(exchangeRateEl.value);
+    if(!isFinite(rawRate)){ resultEl.textContent = '⚠️ Enter the exchange rate'; return; }
+
+    const inputUnit = inputUnitEl.value;
+    const fromCurrency = fromCurrencyEl.value;
+    const toCurrency = toCurrencyEl.value;
+    const outputUnit = outputUnitEl.value;
+    const exFrom = exFromCurrencyEl.value;
+    const exTo = exToCurrencyEl.value;
+
+    let multiplier = null;
+    if (exFrom === fromCurrency && exTo === toCurrency){ multiplier = rawRate; }
+    else if (exFrom === toCurrency && exTo === fromCurrency){ multiplier = 1 / rawRate; }
+    else { resultEl.textContent = '⚠️ Please set the exchange row to match the currencies you are converting (either "1 From = ? To" or "1 To = ? From").'; return; }
+
+    const baseAmount = amount * (inputUnit ? units[inputUnit] : 1);
+    const convertedAbs = baseAmount * multiplier;
+    const final = outputUnit ? convertedAbs / units[outputUnit] : convertedAbs;
+
+    const finalWords = numberToWords(Math.floor(convertedAbs)) + (convertedAbs%1 ? ' point ' + numberToWords(Math.round((convertedAbs%1)*100)) : '');
+
+    resultEl.textContent =
+      `${pretty(amount)} ${inputUnit || ''} ${fromCurrency} = ${pretty(final)} ${outputUnit || ''} ${toCurrency} (${finalWords} ${toCurrency})`;
+    noteEl.textContent = `Based on: 1 ${exFrom} = ${pretty(rawRate)} ${exTo}`;
+  }
+
+  [amountEl, exchangeRateEl].forEach(el => el.addEventListener('keydown', e => { if (e.key === 'Enter') convert(); }));
+  convertBtn.addEventListener('click', convert);
+})();
+</script>
+</body>
+</html>
